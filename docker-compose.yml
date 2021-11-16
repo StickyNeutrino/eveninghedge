@@ -1,0 +1,9 @@
+version: '3.9'
+
+services:
+
+  scrape-db:
+    build: db
+
+  scrape:
+    build: scrape
