@@ -1,11 +1,23 @@
 FROM rust as build
 
-COPY ./src ./src
+
+RUN cargo new cache 
+
+COPY ./Cargo.toml ./cache/Cargo.toml
+
+WORKDIR /cache
+
+RUN cargo build --release
+
+
+COPY ./src ./src 
+
+RUN rm ./target/release/deps/scraper*
 
 RUN cargo build --release
 
 FROM debian:buster-slim
 
-COPY --from=build /holodeck/target/release/app .
+COPY --from=build /cache/target/release/scraper ./app
 
 CMD ["./app"]
