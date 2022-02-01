@@ -1,5 +1,14 @@
 const eve_api = require("./api.js");
 const fs = require('fs').promises;
+const sql = require('./db.js')
+
+sql`
+  select name from locations
+`.then( result => 
+{
+
+    console.log(result)
+})
 
 console.time('all_orders')
 eve_api.all_orders(10000002).then(array => {
