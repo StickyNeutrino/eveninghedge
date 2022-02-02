@@ -1,26 +1,64 @@
 const eve_api = require("./api.js");
-const fs = require('fs').promises;
-const sql = require('./db.js')
+const db = require('./db.js')
 
-sql`
-  select name from locations
-`.then( result => 
-{
+const gen_fetch = (get_api_ids, get_db_ids, get_api_info, insert_db) => {
+    return async () => {
+        const api_ids = get_api_ids()
 
-    console.log(result)
-})
+        const db_ids = await get_db_ids()
+    
+        const new_ids = ( await api_ids ).filter( (id) => ! db_ids.includes(id)  ) 
+    
+        const new_info_fetch = new_ids.map( async (id) => {
+            try {
+                return await get_api_info(id)
+            } catch (e) {
+                console.log(" caught error ")
+                return null 
+            }
+        })
 
-console.time('all_orders')
-eve_api.all_orders(10000002).then(array => {
-    Promise.all(array.map(async (page_promise) => {
-        let page = await page_promise;
+        const new_info = await Promise.all( new_info_fetch )
 
-        let page_string = JSON.stringify(page);
+    
+        return insert_db(new_info.filter( (info) => info != null ))
+    }
+}
 
-        let filename = page.headers["etag"];
+const fetch_regions = gen_fetch(
+    eve_api.region_ids ,
+    db.existing_region_ids,
+    eve_api.region_info, 
+    db.insert_regions)
+    
 
-        return fs.writeFile("/data/" + filename, page_string)
+const fetch_constellations = gen_fetch(
+    eve_api.constellations_ids ,
+    db.existing_constellations_ids,
+    eve_api.constellations_info, 
+    db.insert_constellations)
 
-    }))
-    console.timeEnd('all_orders')
-})
+
+const main = async () => {
+
+    console.time('load_client')
+    await eve_api.load_client()
+    console.timeEnd('load_client')
+
+    console.time('fetch_region')
+    await fetch_regions()
+    console.timeEnd('fetch_region')
+
+    console.time('fetch_constellations')
+    await fetch_constellations()
+    console.timeEnd('fetch_constellations')
+
+    console.time('db.sql')
+    await db.sql`
+        SELECT name 
+        FROM constellations
+    `.then(console.log)
+    console.timeEnd('db.sql')
+}
+
+main()
