@@ -23,7 +23,7 @@ exports.insert_regions = ( regions ) => {
     }
 }
 
-exports.existing_constellations_ids = async () => {
+exports.existing_constellation_ids = async () => {
     const objs = await sql`SELECT constellation_id FROM constellations` 
 
     return objs.map(obj =>  {  return obj.constellation_id    })
@@ -42,6 +42,22 @@ exports.insert_constellations = ( constellations ) => {
         return sql`
         INSERT INTO constellations ${
             sql( constellations.map( flatten_position ), 'constellation_id', 'name', 'region_id', 'x', 'y', 'z')
+        }
+        `
+    }
+}
+
+exports.existing_location_ids = async () => {
+    const objs = await sql`SELECT id FROM locations` 
+
+    return objs.map(obj =>  {   return obj.id    })
+}
+
+exports.insert_locations = ( locations ) => {
+    if ( locations.length ){
+        return sql`
+        INSERT INTO locations ${
+            sql( locations, 'id', 'name', 'type')
         }
         `
     }

@@ -17,15 +17,31 @@ CREATE TABLE constellations (
   PRIMARY KEY( constellation_id )
 );
 
-CREATE TABLE locations (
-  id INT,
+CREATE TABLE systems (
+  system_id INT,
+  constellation_id INT NOT NULL REFERENCES constellations,
   name TEXT NOT NULL,
-  PRIMARY KEY( id )
+  PRIMARY KEY( system_id )
 );
 
-CREATE TABLE systems (
-  id INT,
+CREATE TABLE stations (
+  station_id INT,
+  name TEXT,
+  system_id INT NOT NULL REFERENCES systems,
+  PRIMARY KEY( station_id )
+);
+
+CREATE TABLE structures (
+  structure_id INT,
   name TEXT NOT NULL,
+  system_id INT NOT NULL REFERENCES systems,
+  PRIMARY KEY( structure_id )
+);
+
+CREATE TABLE locations (
+  id BIGINT,
+  name TEXT,
+  type TEXT NOT NULL,
   PRIMARY KEY( id )
 );
 

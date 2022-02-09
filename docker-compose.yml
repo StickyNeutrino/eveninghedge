@@ -6,10 +6,6 @@ services:
     build: jscrape
     environment:
       POSTGRES_PASSWORD: LKFO#*)
-    volumes:
-    - type: bind
-      source: ./data
-      target: /data
 
   database:
     build: db

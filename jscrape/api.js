@@ -18,18 +18,29 @@ exports.region_info = async (region) =>  {
     return response.then( r => r.obj )
 }
 
-exports.constellations_ids = async () => {
+exports.constellation_ids = async () => {
     const response = ( await client ).apis.Universe.get_universe_constellations()
     return response.then( r => r.obj )
 }
 
-exports.constellations_info = async (constellation) => {
+exports.constellation_info = async (constellation) => {
     const response = (await client).apis.Universe.get_universe_constellations_constellation_id({ constellation_id: constellation })
     return response.then( r => r.obj )
 }
 
 exports.location_ids = async () => {
-    return (await client).apis.Universe.get_universe_structures()
+    const response = (await client).apis.Universe.get_universe_structures()
+    return response.then( r => r.obj )
+}
+
+exports.locations_info = async ( locations ) => {
+    const response = (await client).apis.Universe.post_universe_names({ ids: locations })
+
+    return response.then( r => { 
+        return r.obj.map( (location) => {
+            return location.type = location.category
+        })
+    })
 }
 
 exports.orders = async (region) =>  {
