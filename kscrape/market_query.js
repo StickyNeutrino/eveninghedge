@@ -107,5 +107,11 @@ class MarketPageQuery extends RepeatQuery {
         if (changed_orders.length === 0) {
             return
         }
+
+        return save_orders(query_record, changed_orders)
+    }
+
+    async save_orders (query, changed_orders) {
+        
     }
 }

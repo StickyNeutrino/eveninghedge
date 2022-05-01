@@ -54,3 +54,5 @@ class RepeatQuery extends Query {
         }
     }
 }
+
+exports.RepeatQuery = RepeatQuery

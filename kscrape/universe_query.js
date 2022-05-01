@@ -48,10 +48,12 @@ function make_UniverseQuery(initial, detail, id_name) {
             return response.then( r => r.obj )
         }
     
-        save(data) {
-    
+        async save(data) {
+            console.log(data)
         }
     } 
+
+    return new InitialQuery()
 
 }
 
