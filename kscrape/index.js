@@ -1,11 +1,11 @@
-const { get_constellations, get_regions, get_systems, get_types, get_groups, get_graphics, get_categorys } = require("./universe_query");
-
-const run_once = [ get_constellations, get_regions, get_systems, get_types, get_groups, get_graphics, get_categorys ]
+import { all_queries } from "./universe_query.js";
 
 async function main () {
-    const static_info = run_once.map(query => query.run())
-
-    await Promise.all(static_info)
+    console.log("main")
+    console.time('all')
+    await Promise.all(all_queries.map( q => q.run()))
+    console.timeEnd('all')
+    
 } 
 
 main()

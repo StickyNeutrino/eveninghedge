@@ -1,72 +1,85 @@
 
 
-const { Query, client } = import("./query.js")
-
+import { Query, client } from "./query.js";
+import { sql } from "./db.js";
 
 function retry(fn, retries=3, err=null) {
     if (!retries) {
-      return Promise.reject(err);
+        console.log("retry fail:", err)
+        return Promise.reject(err);
     }
     return fn().catch(err => retry(fn, (retries - 1), err))
   }
 
-function make_UniverseQuery(initial, detail, id_name) {
+class UniverseQuery extends Query {
+    constructor( thing,  plural){
+        super()
+        const plural_thing = plural || thing + 's'
+        this.initial = `get_universe_${ plural_thing }`
+        this.detail =  `get_universe_${ plural_thing }_${thing}_id`
+        this.id_name = `${thing}_id`
+        this.db_table = plural_thing
+    }
+    async fetch() {
+        const response = ( await client ).apis.Universe[ this.initial ]()
+        console.log("original")
+        const ids = ( await response ).obj
 
-    class InitialQuery extends Query {
-        async fetch() {
-            const response = ( await client ).apis.Universe[initial]()
-    
-            const ids = ( await response ).obj
+        ids.map(id => {
 
-            ids.map(id => {
+            let query_obj = new Object
+            query_obj[this.id_name] = id
 
-                let query_obj = new Object
-                query_obj[id_name] = id
+            const query = new Specific_Query( query_obj, this.detail, this.id_name, this.db_table )
 
-                const query = Specific_Query( query_obj )
+            return retry(query.run.bind(query), 3)
 
-                return retry(query.run, 3)
+            })
 
-                })
-    
-            return Promise.all(ids)
-        }
-    
-        save(data) {
-            console.log("RegionsQuery save")
-            //Specifics save data
-        }
-    } 
-    
-    class Specific_Query extends Query {
-        constructor( query ) {
-            this.query = query
-        }
-    
-        async fetch() {
-            const response = ( await client ).apis.Universe[detail]( this.query )
-            return response.then( r => r.obj )
-        }
-    
-        async save(data) {
-            console.log(data)
-        }
-    } 
+        return Promise.all(ids)
+    }
 
-    return new InitialQuery()
+    save(data) {
+        console.log("original",data)
+        
+        //Specifics save data
+    }
+} 
 
-}
+class Specific_Query extends Query {
+    constructor( query, detail, id_name , db_table) {
+        super()
+        this.query = query
+        this.detail = detail
+        this.id_name = id_name
+        this.db_table = db_table
+    }
 
-const universe_query_helper = ( thing ) => {
-    return  make_UniverseQuery(`get_universe_${thing}s`, `get_universe_${thing}s_${thing}_id`, `${thing}_id`)
-}
+    async fetch() {
+        const response = ( await client ).apis.Universe[this.detail]( this.query )
+        return response.then( r => ({ ...this.query, info: JSON.stringify(r.obj) }))
+    }
 
-exports.get_regions = universe_query_helper("region")
-exports.get_constellations = universe_query_helper("constellation")
-exports.get_systems = universe_query_helper("system")
+    async save(data) {
+        return sql` INSERT INTO ${ sql(this.db_table) } 
+            ${ sql( data, this.id_name, 'info') }
+            ON CONFLICT DO NOTHING`//update??
+    }
+} 
 
-exports.get_categorys = universe_query_helper("category")
-exports.get_groups = universe_query_helper("group")
-exports.get_types = universe_query_helper("type")
 
-exports.get_graphics = universe_query_helper("graphic")
+const get_regions = new UniverseQuery("region")
+const get_constellations = new UniverseQuery("constellation")
+const get_systems = new UniverseQuery("system")
+
+export { get_regions, get_constellations, get_systems }
+
+const get_categorys = new UniverseQuery("category", "categories")
+const get_groups = new UniverseQuery("group")
+const get_types = new UniverseQuery("type")
+export { get_groups, get_types, get_categorys } 
+
+const get_graphics = new UniverseQuery("graphic")
+export { get_graphics }
+
+export const all_queries = [ get_regions, get_constellations, get_systems, get_groups, get_types, get_graphics, get_categorys]

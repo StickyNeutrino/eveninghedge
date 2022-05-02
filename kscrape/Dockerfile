@@ -18,4 +18,4 @@ RUN mkdir ./data
 # Bundle app source
 COPY . .
 
-CMD [ "node", "index.js" ]
+CMD [ "node", "index.js"]

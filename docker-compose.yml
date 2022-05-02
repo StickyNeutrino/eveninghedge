@@ -7,6 +7,16 @@ services:
     environment:
       POSTGRES_PASSWORD: LKFO#*)
 
+  kscrape:
+    build: kscrape
+    environment:
+      POSTGRES_PASSWORD: LKFO#*)
+
+  kscrape_db:
+    build: kscrape_db
+    environment:
+      POSTGRES_PASSWORD: LKFO#*)
+
   database:
     build: db
     environment:

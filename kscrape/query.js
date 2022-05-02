@@ -1,15 +1,29 @@
 
-const SwaggerClient = require('swagger-client');
-
+import SwaggerClient from 'swagger-client';
+import fetch from 'node-fetch';
+import https from 'node:https';
 let OAS_uri = "https://esi.evetech.net/latest/swagger.json?datasource=tranquility";
 
-let client = SwaggerClient(OAS_uri);
+const httpsAgent = new https.Agent({
+	keepAlive: true
+});
 
-exports.client = client ;
+httpsAgent.maxSockets = 16;
 
-exports.load_client = async () => {
+const agentFetch = (url) => {
+    return fetch(url, {agent:httpsAgent})
+}
+
+
+let client = new SwaggerClient({ url: OAS_uri, userFetch: agentFetch});
+
+export { client } ;
+
+const load_client = async () => {
     await client
 }
+
+export { load_client }
 
 class Query {
     async run() {
@@ -30,6 +44,7 @@ class Query {
 class RepeatQuery extends Query {
 
     constructor() {
+        super()
         this.next_run = Date.now()
     }
 
@@ -48,11 +63,12 @@ class RepeatQuery extends Query {
  
     async run() {
         while (true) {
+            console.log("repeat")
             await this.query_ready
 
-            await super.run()
+            await super.run.bind(this)()
         }
     }
 }
 
-exports.RepeatQuery = RepeatQuery
+export { Query, RepeatQuery }
