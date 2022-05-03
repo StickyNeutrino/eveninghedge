@@ -1,5 +1,6 @@
 
-const { RepeatQuery, Query, client } = import("./query.js")
+import { RepeatQuery, Query, client } from "./query.js";
+import { sql } from "./db.js";
 
 class MarketRegionQuery extends Query {
     constructor( region_id ) { 
@@ -7,7 +8,7 @@ class MarketRegionQuery extends Query {
     }
 
     fetch_page ( page ) { 
-        this.pages[page] = MarketPageQuery(this.region_id, page, this.pages_callback )
+        this.pages[page] = MarketPageQuery(this.region_id, page, this.pages_callback.bind(this) )
         .run()
         .catch( error => {
             console.error(error)
@@ -15,9 +16,9 @@ class MarketRegionQuery extends Query {
         }) 
     }
 
-    pages_callback ( num_pages ) {
-        [...Array(num_pages).keys()]
-        .forEach( page => {
+    async pages_callback ( num_pages ) {
+            [...Array(num_pages).keys()]
+            .forEach( async page => {
             if ( this.pages[page] == undefined ) {
                 this.fetch_page(page)
             }
@@ -108,10 +109,19 @@ class MarketPageQuery extends RepeatQuery {
             return
         }
 
-        return save_orders(query_record, changed_orders)
+        return Promise.all( save_orders(changed_orders), save_query_run( query_record ))
     }
 
-    async save_orders (query, changed_orders) {
+    async save_orders ( changed_orders ) {
         
+    }
+
+    async save_query_run ( query ) {
+        return sql`
+         INSERT INTO market_queries 
+         (type, query)
+         values
+           (${"get_markets_region_id_orders"}, ${ JSON.stringify(query) })
+        ON CONFLICT DO NOTHING`.then(r => console.log(r))
     }
 }

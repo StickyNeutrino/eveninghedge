@@ -57,12 +57,12 @@ class Specific_Query extends Query {
 
     async fetch() {
         const response = ( await client ).apis.Universe[this.detail]( this.query )
-        return response.then( r => ({ ...this.query, info: JSON.stringify(r.obj) }))
+        return response.then( r => ({ id: this.query[id_name], info: JSON.stringify(r.obj) }))
     }
 
     async save(data) {
         return sql` INSERT INTO ${ sql(this.db_table) } 
-            ${ sql( data, this.id_name, 'info') }
+            ${ sql( data, 'id', 'info') }
             ON CONFLICT DO NOTHING`//update??
     }
 } 
