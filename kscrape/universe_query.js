@@ -8,7 +8,7 @@ function retry(fn, retries=3, err=null) {
         console.log("retry fail:", err)
         return Promise.reject(err);
     }
-    return fn().catch(err => retry(fn, (retries - 1), err))
+    return fn().catch(err => {console.log("retrying"); retry(fn, (retries - 1), err)})
   }
 
 class UniverseQuery extends Query {
@@ -22,26 +22,23 @@ class UniverseQuery extends Query {
     }
     async fetch() {
         const response = ( await client ).apis.Universe[ this.initial ]()
-        console.log("original")
+
         const ids = ( await response ).obj
 
-        ids.map(id => {
-
-            let query_obj = new Object
-            query_obj[this.id_name] = id
-
-            const query = new Specific_Query( query_obj, this.detail, this.id_name, this.db_table )
-
-            return retry(query.run.bind(query), 3)
-
-            })
-
-        return Promise.all(ids)
+        return Promise.all(
+            ids.map(id => {
+    
+                let query_obj = new Object
+                query_obj[this.id_name] = id
+    
+                const query = new Specific_Query( query_obj, this.detail, this.id_name, this.db_table )
+    
+                return retry(query.run.bind(query), 3)
+    
+                }))
     }
 
     save(data) {
-        console.log("original",data)
-        
         //Specifics save data
     }
 } 
@@ -56,14 +53,15 @@ class Specific_Query extends Query {
     }
 
     async fetch() {
-        const response = ( await client ).apis.Universe[this.detail]( this.query )
-        return response.then( r => ({ id: this.query[id_name], info: JSON.stringify(r.obj) }))
+        const response = ( await client ).apis.Universe[this.detail]( this.query ).catch(e => console.log(e.response.statusText))
+        return response.then( r => ({ id: this.query[this.id_name], info: JSON.stringify(r.obj) }))
+        
     }
 
     async save(data) {
         return sql` INSERT INTO ${ sql(this.db_table) } 
             ${ sql( data, 'id', 'info') }
-            ON CONFLICT DO NOTHING`//update??
+            ON CONFLICT DO NOTHING`
     }
 } 
 

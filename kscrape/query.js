@@ -37,7 +37,7 @@ class Query {
     }
 
     save(data) {
-
+        console.log("query save")
     }
 }
 
@@ -52,7 +52,7 @@ class RepeatQuery extends Query {
         function setToHappen(fn, date){
             const diff = date - Date.now()
 
-            return setTimeout(fn, diff > 0 ? diff : 5 * 1000 );
+            return setTimeout(fn, diff > 0 ? diff : 500);
         }
         return new Promise((resolve) => setToHappen(resolve, this.next_run))
     }
@@ -63,7 +63,6 @@ class RepeatQuery extends Query {
  
     async run() {
         while (true) {
-            console.log("repeat")
             await this.query_ready
 
             await super.run.bind(this)()

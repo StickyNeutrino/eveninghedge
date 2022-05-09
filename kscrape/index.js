@@ -1,10 +1,22 @@
-import { all_queries } from "./universe_query.js";
+import { get_regions } from "./universe_query.js";
+import { MarketRegionQuery } from "./market_query.js";
+import { sql } from "./db.js";
 
 async function main () {
     console.log("main")
-    console.time('all')
-    await Promise.all(all_queries.map( q => q.run()))
-    console.timeEnd('all')
+
+    console.time("Regions")
+    get_regions.run()
+    console.timeEnd("Regions")
+
+    const records = await sql`
+    SELECT id FROM regions
+    `
+    const ids = records.map( record => record.id)
+    
+    ids.map(id => {
+        new MarketRegionQuery( id ).run()
+    });
     
 } 
 
