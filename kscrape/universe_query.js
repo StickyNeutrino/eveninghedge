@@ -1,8 +1,7 @@
-
-
-import { Query, client } from "./query.js";
+import { Query } from "./query.js";
 import { sql } from "./db.js";
-
+import { client } from "./api.js"
+ 
 function retry(fn, retries=3, err=null) {
     if (!retries) {
         console.log("retry fail:", err)
@@ -55,7 +54,6 @@ class Specific_Query extends Query {
     async fetch() {
         const response = ( await client ).apis.Universe[this.detail]( this.query ).catch(e => console.log(e.response.statusText))
         return response.then( r => ({ id: this.query[this.id_name], info: JSON.stringify(r.obj) }))
-        
     }
 
     async save(data) {
