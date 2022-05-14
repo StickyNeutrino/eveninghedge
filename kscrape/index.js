@@ -13,11 +13,9 @@ async function main () {
     SELECT id FROM regions
     LIMIT 3
     `
-    const ids = records.map( record => record.id)
-    
-    ids.map(id => {
-        new MarketRegionQuery( id ).run()
-    });
+    records
+    .map( record => record.id)
+    .map( id =>  new MarketRegionQuery( id ).run() )
     
 } 
 
