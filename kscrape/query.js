@@ -1,33 +1,28 @@
-class Query {
+export class Query {
     async run() {
         const data = await this.fetch()
 
         return this.save(data)
     }
 
-    fetch() {
-
-    }
+    fetch() { }
 
     save(data) {
-        console.log("query save")
+        //Should not run
+        console.log("Empty Save", data)
     }
 }
 
-class RepeatQuery extends Query {
+export class RepeatQuery extends Query {
 
     constructor() {
         super()
         this.next_run = Date.now()
     }
 
+    // Maybe? an issue if new query_ready changes after awaiting
     get query_ready() {
-        function setToHappen(fn, date){
-            const diff = date - Date.now()
-
-            return setTimeout(fn, diff > 0 ? diff : 500);
-        }
-        return new Promise((resolve) => setToHappen(resolve, this.next_run))
+        date_promise( this.next_run )
     }
 
     set query_ready ( date ) {
@@ -43,4 +38,12 @@ class RepeatQuery extends Query {
     }
 }
 
-export { Query, RepeatQuery }
+function date_promise( date ){
+    const min_time = 500 
+
+    return new Promise((resolve) => {
+        const wait_time =  date - Date.now()
+
+        setTimeout(resolve, wait_time > min_time ? wait_time : min_time);
+    })
+}
