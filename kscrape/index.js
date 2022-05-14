@@ -6,7 +6,7 @@ async function main () {
     console.log("main")
 
     console.time("Regions")
-    get_regions.run()
+    await get_regions.run()
     console.timeEnd("Regions")
 
     const records = await sql`
