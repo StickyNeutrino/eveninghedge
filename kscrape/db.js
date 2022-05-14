@@ -11,8 +11,19 @@ export async function insert_market_queries( queries ) {
     INSERT INTO market_queries 
     (type, query)
     values
-      (${"get_markets_region_id_orders"}, ${ JSON.stringify(queries[0]) })
-   ON CONFLICT DO NOTHING`.then(r => console.log(r))
+        (${"get_markets_region_id_orders"}, ${ JSON.stringify(queries[0]) })
+    ON CONFLICT DO NOTHING
+    RETURNING id
+`
+}
+
+export async function insert_orders( orders ){
+
+    return sql`
+    INSERT INTO orders
+    ${sql(orders)}    
+    ON CONFLICT DO NOTHING`.then(r => console.log(r))
+    
 }
 
 export async function insert_order_observations( observations, query_id ){
@@ -20,6 +31,7 @@ export async function insert_order_observations( observations, query_id ){
 
     return sql`
     INSERT INTO order_observations 
-    ${sql(observations.map(with_query_id), 'price', 'volume_remain', 'type', 'query_id')}    `
-
+    ${sql(observations.map(with_query_id), 'price', 'volume_remain', 'order_id', 'query_id')}    
+    `.then(r => console.log(r))
+    
 }

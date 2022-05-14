@@ -55,29 +55,32 @@ CREATE TABLE graphics (
 );
 
 CREATE TABLE market_queries (
-  id SERIAL ,
+  id BIGSERIAL ,
+  type TEXT,
   query JSONB,
   PRIMARY KEY( id )
 );
 
 CREATE TABLE orders (
-  id INT,
+  order_id BIGINT,
   duration INT NOT NULL,
   is_buy_order BOOL NOT NULL,
   issued DATE NOT NULL, 
-  location_id INT NOT NULL,
-  min_volume INT NOT NULL,
+  location_id BIGINT NOT NULL,
+  min_volume BIGINT NOT NULL,
   range TEXT NOT NULL,
   system_id INT NOT NULL,
   type_id INT NOT NULL,
   volume_total INT NOT NULL,
-  PRIMARY KEY( id )
+  price NUMERIC(14,2),
+  volume_remain INT,
+  PRIMARY KEY( order_id )
 );
 
 CREATE TABLE order_observations (
-  price NUMERIC(12,2),
+  price NUMERIC(14,2),
   volume_remain INT,
-  order_id INT NOT NULL REFERENCES orders( id ),
-  query_id INT NOT NULL REFERENCES market_queries( id ),
+  order_id BIGINT NOT NULL REFERENCES orders,
+  query_id BIGINT NOT NULL REFERENCES market_queries( id ),
   PRIMARY KEY ( order_id, query_id )
 );

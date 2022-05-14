@@ -11,6 +11,7 @@ async function main () {
 
     const records = await sql`
     SELECT id FROM regions
+    LIMIT 3
     `
     const ids = records.map( record => record.id)
     

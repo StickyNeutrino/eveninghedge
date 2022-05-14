@@ -1,6 +1,6 @@
 
 import { RepeatQuery, Query } from "./query.js";
-import { insert_market_queries, insert_order_observations } from "./db.js";
+import { insert_market_queries, insert_order_observations, insert_orders } from "./db.js";
 import { has_changed } from "./observation_cache.js";
 import { client } from "./api.js";
 
@@ -73,8 +73,12 @@ class MarketPageQuery extends RepeatQuery {
 
         if (changed_orders.length === 0) return
 
-        const insert_response = await insert_market_queries([query_record])[0]
+        await insert_orders(changed_orders)
 
-        return insert_order_observations( changed_orders, insert_response.query_id )
+        const insert_response = await insert_market_queries([query_record])
+
+        console.log(changed_orders.length)
+
+        return insert_order_observations( changed_orders, insert_response[0].id )
     }
 }
