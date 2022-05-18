@@ -1,6 +1,3 @@
-import { sql } from "./db.js";
-
-const order_cache = new Map
 
 class OrderObservationsCache {
     constructor( order_id ) {
@@ -24,20 +21,11 @@ class OrderObservationsCache {
             return this.last.order
         } else {
             return undefined
-            return await sql`
-                SELECT * 
-                FROM order_observations
-                JOIN market_queries
-                ON order_observations.query_id = market_queries.id
-                WHERE order_observations.order_id = ${ this.order_id }
-                AND ${ before_date } > (market_queries.query->>'last-modified')::timestamp
-                ORDER BY (market_queries.query->>'last-modified')::timestamp DESC
-                LIMIT 1
-            `.then( r => {console.log(r); return r[0]} )
         }
     }
 }
 
+const order_cache = new Map
 
 export const has_changed = ( observation_time ) => async ( order ) => {
 
@@ -47,9 +35,7 @@ export const has_changed = ( observation_time ) => async ( order ) => {
         order_cache.set( order_id, new OrderObservationsCache( order_id ))
     }
 
-    const order_observations = order_cache.get( order_id )
-
-    const last_before = await order_observations.latest( observation_time )
+    const last_before = await order_cache.get( order_id ).latest( observation_time )
 
     order_cache.get( order_id ).add( order, observation_time )
 
