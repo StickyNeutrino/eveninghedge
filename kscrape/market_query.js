@@ -67,9 +67,7 @@ class MarketPageQuery extends RepeatQuery {
 
         const order_records = response.obj
 
-        const observation_date = Date(response.headers['last-modified'])
-
-        const changed_orders = order_records.filter(has_changed( observation_date ))
+        const changed_orders = order_records.filter( has_changed( response.headers['last-modified']) )
 
         if (changed_orders.length === 0) return
 
@@ -77,7 +75,7 @@ class MarketPageQuery extends RepeatQuery {
 
         const insert_response = await insert_market_queries([query_record])
 
-        console.log(changed_orders.length)
+        console.log("percent new:" , changed_orders.length / order_records.length)
 
         return insert_order_observations( changed_orders, insert_response[0].id )
     }
