@@ -14,7 +14,7 @@ export class MarketRegionQuery extends Query {
         this.pages[page] = new MarketPageQuery(this.region_id, page, this.pages_callback.bind(this) )
         .run()
         .catch( error => {
-            console.error( "fetch_page error:", error )
+            console.error( "MarketRegionQuery fetch_page:", error )
             this.pages.set(page, undefined)
         }) 
     }
@@ -54,7 +54,7 @@ class MarketPageQuery extends RepeatQuery {
 
             return response
         } catch (error) {
-            console.log(error)
+            console.error("MarketPageQuery fetch:", error)
             
             throw "MarketPageQuery fetch failed"
         }
@@ -75,7 +75,7 @@ class MarketPageQuery extends RepeatQuery {
 
         const insert_response = await insert_market_queries([query_record])
 
-        console.log("percent new:" , changed_orders.length / order_records.length)
+        console.log(`region:page ${ this.region_id }:${ this.page }:${ changed_orders.length / order_records.length }%`)
 
         return insert_order_observations( changed_orders, insert_response[0].id )
     }

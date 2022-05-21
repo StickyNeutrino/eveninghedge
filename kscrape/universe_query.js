@@ -55,7 +55,10 @@ function retry(fn, retries=3, err=null) {
         console.log("retry fail:", err)
         return Promise.reject(err);
     }
-    return fn().catch(err => {console.log("retrying"); retry(fn, (retries - 1), err)})
+    return fn().catch( err => {
+        console.warn("retrying")
+        return retry(fn, (retries - 1), err)
+    })
 }
 
 
