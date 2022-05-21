@@ -17,33 +17,34 @@ export class RepeatQuery extends Query {
 
     constructor() {
         super()
-        this.next_run = Date.now()
+        console.log("RepeatQuery")
+        this.next_run =  date_promise( Date.now() )
     }
 
     // Maybe? an issue if new query_ready changes after awaiting
-    get query_ready() {
-        date_promise( this.next_run )
-    }
+    query_ready() {
+        return this.next_run
+    } 
 
-    set query_ready ( date ) {
-        this.next_run = new Date( date ) 
+    set_next_run ( date ) {
+        this.next_run =  date_promise( date )
     }
  
     async run() {
-        while (true) {
-            await this.query_ready
-
+        while (true) { 
+            console.log(this.page, "waiting")
+            await this.query_ready()
+            console.log(this.page, "running")
             await super.run.bind(this)()
         }
     }
 }
 
 function date_promise( date ){
-    const min_time = 500 
+    const min_time =  5000
 
     return new Promise((resolve) => {
-        const wait_time =  date - Date.now()
-
+        const wait_time = new Date(date) - Date.now()
         setTimeout(resolve, wait_time > min_time ? wait_time : min_time);
     })
 }

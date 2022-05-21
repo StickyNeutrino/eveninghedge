@@ -48,7 +48,7 @@ class MarketPageQuery extends RepeatQuery {
         try {
             const response = await ( await client ).apis.Market.get_markets_region_id_orders({ region_id: this.region_id, page: this.page })
 
-            this.query_ready = response.headers['expires'];
+            this.set_next_run(response.headers['expires'])
 
             this.pages_callback(Number(response.headers['x-pages']))
 
