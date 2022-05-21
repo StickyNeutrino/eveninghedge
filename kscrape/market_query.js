@@ -8,23 +8,26 @@ export class MarketRegionQuery extends Query {
     constructor( region_id ) { 
         super()
         this.region_id = region_id
+        console.log("new market region")
     }
 
     fetch_page ( page ) { 
-        this.pages[page] = new MarketPageQuery(this.region_id, page, this.pages_callback.bind(this) )
+        console.log("Fetch", page)
+        this.pages.set( page, new MarketPageQuery(this.region_id, page, this.pages_callback.bind(this) )
         .run()
         .catch( error => {
             console.error( "MarketRegionQuery fetch_page:", error )
             this.pages.set(page, undefined)
-        }) 
+        }))
     }
 
     async pages_callback ( num_pages ) {
-        [...Array(num_pages - 1).keys()]
-        .forEach( async page => {
+        
+        return Promise.all([...Array(num_pages - 1).keys()]
+        .map( async page => {
         if ( !this.pages.has(page + 1 ) ) {
             this.fetch_page(page + 1)
-        }})
+        }}))
     }
 
     async fetch ( ) { 
@@ -65,7 +68,7 @@ class MarketPageQuery extends RepeatQuery {
 
     async save( fetch_return ) {
 
-        const changed_orders = fetch_return.orders.filter( has_changed( response.headers['last-modified']) )
+        const changed_orders = fetch_return.orders.filter( has_changed( fetch_return.query.headers['last-modified']) )
 
         if (changed_orders.length === 0) return
 
@@ -73,7 +76,7 @@ class MarketPageQuery extends RepeatQuery {
 
         const insert_response = await insert_market_queries([fetch_return.query])
 
-        console.log(`region:page ${ this.region_id }:${ this.page }:${ changed_orders.length / order_records.length }%`)
+        console.log(`region:page ${ this.region_id }:${ this.page }:${ 100 * ( changed_orders.length / fetch_return.orders.length ) }%`)
 
         return insert_order_observations( changed_orders, insert_response[0].id )
     }

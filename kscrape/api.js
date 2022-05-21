@@ -8,7 +8,7 @@ const httpsAgent = new https.Agent({
 	keepAlive: true
 });
 
-httpsAgent.maxSockets = 16;
+httpsAgent.maxSockets = 1;
 
 export const client = new SwaggerClient({ 
     url: OAS_uri,
