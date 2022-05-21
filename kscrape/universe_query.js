@@ -1,5 +1,5 @@
 import { Query } from "./query.js";
-import { sql } from "./db.js";
+import { insert_universe_info } from "./db.js";
 import { client } from "./api.js"
 
 class UniverseQuery extends Query {
@@ -38,15 +38,11 @@ class Specific_Query extends Query {
     }
 
     async fetch() {
-        const response = fetch_function().catch(e => console.log(e.response.statusText))
-        return transform_response( response )
+        return transform_response(fetch_function())
     }
 
     async save(data) {
-        return sql` 
-            INSERT INTO ${ sql(this.db_table) } 
-            ${ sql( data, 'id', 'info') }
-            ON CONFLICT DO NOTHING`
+        return insert_universe_info( data, this.db_table )
     }
 } 
 
