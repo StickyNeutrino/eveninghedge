@@ -32,14 +32,13 @@ class Specific_Query extends Query {
         let query = new Object
         query[id_name] = id
 
-        this.fetch_function = () => client.then( c => () => ( c.apis.Universe[detail]( query ) ) )
-        this.transform_response = async ( resp ) => ({ id: query[id_name], info: JSON.stringify(await resp.obj) })
-        
+        this.fetch_function = () => client.then( c => ( c.apis.Universe[detail]( query ) ) )
+        this.transform_response = async ( resp ) => ({ id: query[id_name], info: (await resp).data })
     }
 
     async fetch() {
-        return transform_response(fetch_function())
-    }
+        return this.transform_response(this.fetch_function())
+    } 
 
     async save(data) {
         return insert_universe_info( data, this.db_table )

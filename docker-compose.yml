@@ -4,10 +4,12 @@ services:
  
   kscrape:
     build: kscrape
+    depends_on:
+      - kscrape_db
     environment:
-      POSTGRES_PASSWORD: LKFO#*)
+      POSTGRES_PASSWORD: LKJLKJLKJ
 
   kscrape_db:
     build: kscrape_db
     environment:
-      POSTGRES_PASSWORD: LKFO#*)
+      POSTGRES_PASSWORD: LKJLKJLKJ
