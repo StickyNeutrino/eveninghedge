@@ -1,4 +1,4 @@
-FROM node:latest
+FROM node:alpine
 
 
 # Create app directory
@@ -18,4 +18,4 @@ RUN mkdir ./data
 # Bundle app source
 COPY . .
 
-CMD [ "node", "index.js" ]
+CMD [ "node", "index.js"]

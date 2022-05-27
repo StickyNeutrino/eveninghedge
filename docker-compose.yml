@@ -2,12 +2,14 @@ version: '3.3'
 
 services:
  
-  jscrape:
-    build: jscrape
+  kscrape:
+    build: kscrape
+    depends_on:
+      - kscrape_db
     environment:
-      POSTGRES_PASSWORD: LKFO#*)
+      POSTGRES_PASSWORD: LKJLKJLKJ
 
-  database:
-    build: db
+  kscrape_db:
+    build: kscrape_db
     environment:
-      POSTGRES_PASSWORD: LKFO#*)
+      POSTGRES_PASSWORD: LKJLKJLKJ
