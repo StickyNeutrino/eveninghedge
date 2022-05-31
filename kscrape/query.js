@@ -1,3 +1,5 @@
+import { date_promise  } from "./util"
+
 export class Query {
     async run() {
         const data = await this.fetch()
@@ -38,13 +40,4 @@ export class RepeatQuery extends Query {
             await super.run.bind(this)()
         }
     }
-}
-
-function date_promise( date ){
-    const min_time =  5000
-
-    return new Promise((resolve) => {
-        const wait_time = new Date(date) - Date.now()
-        setTimeout(resolve, wait_time > min_time ? wait_time : min_time);
-    })
 }

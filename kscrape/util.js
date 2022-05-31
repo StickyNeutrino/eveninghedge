@@ -10,3 +10,13 @@ export function retry(fn, retries=3, err=null) {
         return retry(fn, (retries - 1), err)
     })
 }
+
+
+export function date_promise( date ){
+    const min_time =  5000
+
+    return new Promise((resolve) => {
+        const wait_time = new Date(date) - Date.now()
+        setTimeout(resolve, wait_time > min_time ? wait_time : min_time);
+    })
+}
