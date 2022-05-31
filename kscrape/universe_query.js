@@ -29,16 +29,20 @@ class Specific_Query extends Query {
     constructor( id, detail, id_name , db_table) {
         super()
         this.db_table = db_table
-
+        this.detail = detail
+    
         let query = new Object
         query[id_name] = id
 
-        this.fetch_function = () => client.then( c => ( c.apis.Universe[detail]( query ) ) )
+        this.query = query
+        
         this.transform_response = async ( resp ) => ({ id: query[id_name], info: (await resp).data })
     }
 
     async fetch() {
-        return this.transform_response(this.fetch_function())
+        const response =  ( await client ).apis.Universe[ this.detail ]( this.query ) 
+
+        return this.transform_response( response )
     } 
 
     async save(data) {
