@@ -9,18 +9,15 @@ export class Query {
 
     fetch() { }
 
-    save(data) {
-        //Should not run
-        console.log("Empty Save", data)
-    }
+    save( data ) { return data }
 }
 
 export class RepeatQuery extends Query {
 
     constructor() {
         super()
-        console.log("RepeatQuery")
-        this.next_run =  date_promise( Date.now() )
+
+        this.set_next_run( Date.now() )
     }
 
     // Maybe? an issue if new query_ready changes after awaiting
@@ -34,9 +31,8 @@ export class RepeatQuery extends Query {
  
     async run() {
         while (true) { 
-            console.log(this.page, "waiting")
             await this.query_ready()
-            console.log(this.page, "running")
+
             await super.run.bind(this)()
         }
     }
