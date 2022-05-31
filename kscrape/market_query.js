@@ -33,11 +33,8 @@ export class MarketRegionQuery extends Query {
 
     pages_callback ( num_pages ) {
         [...range(1, num_pages)]
-        .map( page => {
-            if ( !this.pages.has( page ) ) {
-                this.fetch_page( page )
-            }
-        })
+        .filter( page => !this.pages.has( page ) )
+        .map( page => this.fetch_page( page ) )
     }
 
     async fetch ( ) { 
