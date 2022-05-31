@@ -1,6 +1,7 @@
 import { Query } from "./query.js";
 import { insert_universe_info } from "./db.js";
 import { client } from "./api.js"
+import { retry } from "./util.js"
 
 class UniverseQuery extends Query {
     constructor( thing,  plural ){
@@ -44,18 +45,6 @@ class Specific_Query extends Query {
         return insert_universe_info( data, this.db_table )
     }
 } 
-
-function retry(fn, retries=3, err=null) {
-    if (!retries) {
-        console.log("retry fail:", err)
-        return Promise.reject(err);
-    }
-    return fn().catch( err => {
-        console.warn("retrying")
-        return retry(fn, (retries - 1), err)
-    })
-}
-
 
 
 export const get_regions = new UniverseQuery("region")
