@@ -20,3 +20,22 @@ export function date_promise( date ){
         setTimeout(resolve, wait_time > min_time ? wait_time : min_time);
     })
 }
+
+export function range(start = 0, end = Infinity, step = 1) {
+    return {
+        from: start,
+        to: end,
+        [Symbol.iterator]() {
+            this.current = this.from;
+            return this;
+        },
+        
+       next() {
+            if (this.current <= this.to) {
+                return { done: false, value: this.current++ };
+            } else {
+                return { done: true };
+            }
+        }
+    }
+}

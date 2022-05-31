@@ -17,6 +17,8 @@ export class RepeatQuery extends Query {
     constructor() {
         super()
 
+        this.alive = true
+
         this.set_next_run( Date.now() )
     }
 
@@ -30,7 +32,7 @@ export class RepeatQuery extends Query {
     }
  
     async run() {
-        while (true) { 
+        while (this.alive) { 
             await this.query_ready()
 
             await super.run.bind(this)()

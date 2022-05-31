@@ -3,36 +3,44 @@ import { RepeatQuery, Query } from "./query.js";
 import { insert_market_queries, insert_order_observations, insert_orders } from "./db.js";
 import { has_changed } from "./observation_cache.js";
 import { client } from "./api.js";
+import { range } from "./util.js"
 
 export class MarketRegionQuery extends Query {
     constructor( region_id ) { 
         super()
         this.region_id = region_id
-        console.log("new market region")
+        this.pages = new Map
+        
     }
 
     fetch_page ( page ) { 
-        console.log("Fetch", page)
-        this.pages.set( page, new MarketPageQuery(this.region_id, page, this.pages_callback.bind(this) )
-        .run()
-        .catch( error => {
-            console.error( "MarketRegionQuery fetch_page:", error )
+        const page_query = new MarketPageQuery(this.region_id, page, this.pages_callback.bind(this) )
+
+        const error_handler = ( error ) => {
+            page_query.alive = false
+
             this.pages.set(page, undefined)
-        }))
+
+            console.error( "MarketRegionQuery fetch_page:", error )
+        }
+
+        const run_promise = page_query
+            .run()
+            .catch( error_handler )
+
+        this.pages.set( page, run_promise )
     }
 
-    async pages_callback ( num_pages ) {
-        
-        return Promise.all([...Array(num_pages - 1).keys()]
-        .map( async page => {
-        if ( !this.pages.has(page + 1 ) ) {
-            this.fetch_page(page + 1)
-        }}))
+    pages_callback ( num_pages ) {
+        [...range(1, num_pages)]
+        .map( page => {
+            if ( !this.pages.has( page ) ) {
+                this.fetch_page( page )
+            }
+        })
     }
 
     async fetch ( ) { 
-        this.pages = new Map
-        
         this.fetch_page(1)
 
         return new Promise(() => {})
