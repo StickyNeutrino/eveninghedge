@@ -21,18 +21,21 @@ export class MarketRegionQuery extends Query {
             page_query
             .run()
             .catch(  ( error ) => {
-                this.pages.set(page, undefined)
-    
                 console.error( "MarketRegionQuery fetch_page:", error )
+
+                //infinite recursion 
+                this.fetch_page ( page ) 
             } ) )
     }
 
     pages_callback ( num_pages ) {
         if ( this.num_pages === num_pages ) return
 
-        [...range(1, num_pages)]
+        [...range(this.num_pages, num_pages)]
         .filter( page => !this.pages.has( page ) )
         .forEach( page => this.fetch_page( page ) )
+
+        this.num_pages = num_pages
     }
 
     async fetch ( ) { 
