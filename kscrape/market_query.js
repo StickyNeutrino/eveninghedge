@@ -9,6 +9,7 @@ export class MarketRegionQuery extends Query {
     constructor( region_id ) { 
         super()
         this.region_id = region_id
+        this.num_pages = 1
         this.pages = new Map
         
     }
@@ -27,13 +28,15 @@ export class MarketRegionQuery extends Query {
     }
 
     pages_callback ( num_pages ) {
+        if ( this.num_pages === num_pages ) return
+
         [...range(1, num_pages)]
         .filter( page => !this.pages.has( page ) )
         .forEach( page => this.fetch_page( page ) )
     }
 
     async fetch ( ) { 
-        this.fetch_page(1)
+        this.fetch_page( this.num_pages )
 
         return new Promise(() => {})
     }
