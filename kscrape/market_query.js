@@ -54,7 +54,7 @@ class MarketPageQuery extends RepeatQuery {
     }
 
     async fetch() { 
-        const response = await retry( get_market_region_orders( this.region_id, this.page ), 3 )
+        const response = await retry( () => get_market_region_orders( this.region_id, this.page ), 3 )
 
         this.set_next_run( response.headers['expires'] )
 
