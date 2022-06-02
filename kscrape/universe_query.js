@@ -7,7 +7,7 @@ class UniverseQuery extends Query {
     constructor( thing,  plural ){
         super()
         this.db_table = plural || thing + 's'
-        this.initial = `get_universe_${ this.db_table }`
+        this.initial = `get_universe_${ plural_thing }`
         this.id_name = `${ thing }_id`
         this.detail =  `${ this.initial }_${ this.id_name }`
     }
