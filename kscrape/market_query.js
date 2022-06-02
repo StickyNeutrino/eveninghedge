@@ -16,17 +16,14 @@ export class MarketRegionQuery extends Query {
     fetch_page ( page ) { 
         const page_query = new MarketPageQuery(this.region_id, page, this.pages_callback.bind(this) )
 
-        const error_handler = ( error ) => {
-            this.pages.set(page, undefined)
-
-            console.error( "MarketRegionQuery fetch_page:", error )
-        }
-
-        const run_promise = page_query
+        this.pages.set( page, 
+            page_query
             .run()
-            .catch( error_handler )
-
-        this.pages.set( page, run_promise )
+            .catch(  ( error ) => {
+                this.pages.set(page, undefined)
+    
+                console.error( "MarketRegionQuery fetch_page:", error )
+            } ) )
     }
 
     pages_callback ( num_pages ) {
