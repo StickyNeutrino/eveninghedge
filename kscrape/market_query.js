@@ -17,8 +17,6 @@ export class MarketRegionQuery extends Query {
         const page_query = new MarketPageQuery(this.region_id, page, this.pages_callback.bind(this) )
 
         const error_handler = ( error ) => {
-            page_query.alive = false
-
             this.pages.set(page, undefined)
 
             console.error( "MarketRegionQuery fetch_page:", error )
