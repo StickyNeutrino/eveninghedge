@@ -55,23 +55,16 @@ class MarketPageQuery extends RepeatQuery {
     async fetch() { 
         const response = await retry( get_market_region_orders( this.region_id, this.page ), 3 )
 
-            this.set_next_run(response.headers['expires'])
+        this.set_next_run( response.headers['expires'] )
 
-            this.pages_callback(Number(response.headers['x-pages']))
+        this.pages_callback( Number(response.headers['x-pages']) )
 
-            return { 
-                query: { headers: response.headers, region_id: this.region_id, page: this.page },
-                orders: response.obj }
-        } catch (error) {
-            console.error("MarketPageQuery fetch:", error)
-            
-            throw "MarketPageQuery fetch failed"
-        }
-    
+        return { 
+            query: { headers: response.headers, region_id: this.region_id, page: this.page },
+            orders: response.obj }
     }
 
     async save( fetch_return ) {
-
         const changed_orders = fetch_return.orders.filter( has_changed( fetch_return.query.headers['last-modified']) )
 
         if (changed_orders.length === 0) return
@@ -79,8 +72,6 @@ class MarketPageQuery extends RepeatQuery {
         await insert_orders(changed_orders)
 
         const insert_response = await insert_market_queries([fetch_return.query])
-
-        console.log(`region:page ${ this.region_id }:${ this.page }:${ 100 * ( changed_orders.length / fetch_return.orders.length ) }%`)
 
         return insert_order_observations( changed_orders, insert_response[0].id )
     }
