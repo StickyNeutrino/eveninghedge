@@ -17,23 +17,23 @@ export class RepeatQuery extends Query {
     constructor() {
         super()
 
-        this.alive = true
-
         this.set_next_run( Date.now() )
     }
 
     // Maybe? an issue if new query_ready changes after awaiting
-    query_ready() {
+    get query_ready() {
         return this.next_run
     } 
 
     set_next_run ( date ) {
-        this.next_run =  date_promise( date )
+        this.next_run = date_promise( date )
     }
  
     async run() {
-        while (this.alive) { 
-            await this.query_ready()
+        while (this.query_ready != undefined) { 
+            await this.query_ready
+
+            this.next_run = undefined
 
             await super.run.bind(this)()
         }
