@@ -17,3 +17,6 @@ export const client = new SwaggerClient({
 
 export const load_client = async () => { await client }
 
+export const get_market_region_orders = async ( region_id, page ) => {
+    return ( await client ).apis.Market.get_markets_region_id_orders({ region_id, page })
+}

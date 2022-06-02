@@ -2,8 +2,8 @@
 import { RepeatQuery, Query } from "./query.js";
 import { insert_market_queries, insert_order_observations, insert_orders } from "./db.js";
 import { has_changed } from "./observation_cache.js";
-import { client } from "./api.js";
-import { range } from "./util.js"
+import { get_market_region_orders } from "./api.js";
+import { range, retry } from "./util.js"
 
 export class MarketRegionQuery extends Query {
     constructor( region_id ) { 
@@ -53,8 +53,7 @@ class MarketPageQuery extends RepeatQuery {
     }
 
     async fetch() { 
-        try {
-            const response = await ( await client ).apis.Market.get_markets_region_id_orders({ region_id: this.region_id, page: this.page })
+        const response = await retry( get_market_region_orders( this.region_id, this.page ), 3 )
 
             this.set_next_run(response.headers['expires'])
 
