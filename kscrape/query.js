@@ -37,5 +37,7 @@ export class RepeatQuery extends Query {
 
             await super.run.bind(this)()
         }
+
+        console.warn( "query died", this )
     }
 }
