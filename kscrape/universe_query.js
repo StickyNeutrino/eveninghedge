@@ -6,11 +6,10 @@ import { retry } from "./util.js"
 class UniverseQuery extends Query {
     constructor( thing,  plural ){
         super()
-        const plural_thing = plural || thing + 's'
-        this.initial = `get_universe_${ plural_thing }`
-        this.detail =  `get_universe_${ plural_thing }_${thing}_id`
-        this.id_name = `${thing}_id`
-        this.db_table = plural_thing
+        this.db_table = plural || thing + 's'
+        this.initial = `get_universe_${ this.db_table }`
+        this.id_name = `${ thing }_id`
+        this.detail =  `${ this.initial }_${ this.id_name }`
     }
 
     async fetch() {
