@@ -18,7 +18,6 @@ class OrderObservationsCache {
     async latest( before ) {
         const before_date = new Date(before)
         if ( this.last != undefined && before_date > this.last.time ) {
-            console.log("existing")
             return this.last.order
         } else {
             return undefined
@@ -39,8 +38,6 @@ export const has_changed = ( observation_time ) => async ( order ) => {
     const last_before = await order_cache.get( order_id ).latest( observation_time )
 
     order_cache.get( order_id ).add( order, observation_time )
-
-    console.log( last_before )
 
     if ( last_before == undefined
         || last_before['volume_remain'] != order['volume_remain']
