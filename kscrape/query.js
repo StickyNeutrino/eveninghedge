@@ -1,4 +1,4 @@
-import { date_promise  } from "./util"
+import { date_promise  } from "./util.js"
 
 export class Query {
     async run() {
